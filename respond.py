@@ -1,7 +1,7 @@
-import requests, os, logging
+import os, logging
+from session import _session as SESSION
 
 URL = "https://9uc4obe1q1.execute-api.us-east-2.amazonaws.com/dev/responses"
-_session = requests.Session()                # ← keeps TLS socket open
 
 def post_response(email_id: str, body: str):
     payload = {
@@ -12,6 +12,6 @@ def post_response(email_id: str, body: str):
     if os.getenv("TEST_MODE") == "true":
         payload["test_mode"] = "true"
 
-    r = _session.post(URL, json=payload, timeout=5)
+    r = SESSION.post(URL, json=payload, timeout=5)
     if not r.ok:
         logging.warning("POST %s failed %s %s", email_id, r.status_code, r.text)

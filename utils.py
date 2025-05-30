@@ -27,7 +27,7 @@ def enforce_gap(last_sent_ts: float | None):
         pass
 
 _AVG_LLM_LAT = 0.50                 # 0.4-0.6 s range ⇒ ≈ 0.5 s
-_MAX_THREADS = 128        
+_MAX_THREADS = int(os.getenv("MAX_THREADS", "512"))
 
 def _suggest_pool_size(n_emails: int, max_deadline: float) -> int:
     """
