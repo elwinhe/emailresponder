@@ -20,25 +20,6 @@ This system automatically fetches, processes, and responds to emails while respe
   - python-dotenv
   - urllib3
 
-## Configuration
-
-Create a `.env` file with the following variables:
-
-```env
-# API configuration
-EMAIL_API_KEY=your-api-key
-
-# Mode settings
-TEST_MODE=true
-
-# Logging configuration
-LOG_LEVEL=DEBUG
-
-# Performance hints (optional)
-BATCH_HINT=0
-MAX_DEADLINE_HINT=1.5
-```
-
 ## Usage
 
 1. Install dependencies:
