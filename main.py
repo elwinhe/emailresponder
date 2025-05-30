@@ -42,6 +42,7 @@ def main() -> None:
     future_to_id = {}
 
     for e in emails_sorted:
+        logging.debug("%s deps: %s", e['email_id'], e['dependencies'])
         fut = llm_pool.submit(llm, e["subject"])
         futures[e["email_id"]] = fut
         future_to_id[fut] = e["email_id"]
@@ -50,6 +51,23 @@ def main() -> None:
     waiting_ids = set() 
     last_sent_ns = None
 
+    def check_order(send_log: list[str], id_to_email: dict[str, dict]):
+        """
+        Validates that every email in the send_log was only sent
+        after all its dependencies were also sent.
+        """
+        sent = set()
+
+        for eid in send_log:
+            deps = [d.strip() for d in id_to_email[eid]["dependencies"].split(",") if d.strip()]
+            for dep in deps:
+                if dep not in sent:
+                    raise ValueError(f"Dependency violation: {eid} sent before its parent {dep}")
+            sent.add(eid)
+
+        print(f"[✓] All {len(send_log)} responses respected dependency order.")
+
+    send_log = []
 
     def try_send(e_id: str) -> bool:
         """
@@ -69,6 +87,7 @@ def main() -> None:
         poster.submit(post_response, e_id, body)
         last_sent_ns = time.perf_counter_ns()
         sent_ids.add(e_id)
+        send_log.append(e_id) 
 
         # deadline bookkeeping
         elapsed  = time.time() - fetched_at
@@ -100,6 +119,7 @@ def main() -> None:
 
     poster.shutdown(wait=True)
     llm_pool.shutdown(wait=True)
+    check_order(send_log, id_to_email)
     logging.info("Done – processed %s emails", len(emails_sorted))
 
 

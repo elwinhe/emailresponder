@@ -1,4 +1,4 @@
-import os, logging
+import os, logging, json
 from session import _session as SESSION
 
 URL = "https://9uc4obe1q1.execute-api.us-east-2.amazonaws.com/dev/responses"
@@ -11,6 +11,7 @@ def post_response(email_id: str, body: str):
     }
     if os.getenv("TEST_MODE") == "true":
         payload["test_mode"] = "true"
+        print(json.dumps(payload))
 
     r = SESSION.post(URL, json=payload, timeout=5)
     if not r.ok:
